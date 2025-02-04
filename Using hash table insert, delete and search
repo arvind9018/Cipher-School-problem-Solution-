@@ -1,0 +1,120 @@
+import java.util.*;
+
+class HashTable {
+    private int size;
+    private String method;
+    private LinkedList<Integer>[] chainingTable; // Chaining (Linked List)
+    private Integer[] openAddressingTable; // Open Addressing (Array)
+    private boolean[] deleted; // Mark deleted slots for Open Addressing
+
+    public HashTable(int size, String method) {
+        this.size = size;
+        this.method = method;
+
+        if (method.equals("CHAINING")) {
+            chainingTable = new LinkedList[size];
+            for (int i = 0; i < size; i++) {
+                chainingTable[i] = new LinkedList<>(); // Initialize linked lists
+            }
+        } else if (method.equals("OPEN_ADDRESSING")) {
+            openAddressingTable = new Integer[size];
+            deleted = new boolean[size]; // Mark deleted slots
+        }
+    }
+
+    // Hash Function (Modulo Division)
+    private int hash(int key) {
+        return key % size;
+    }
+
+    // INSERT operation
+    public void insert(int key) {
+        int index = hash(key);
+        
+        if (method.equals("CHAINING")) {
+            if (!chainingTable[index].contains(key)) {
+                chainingTable[index].add(key);
+            }
+        } else if (method.equals("OPEN_ADDRESSING")) {
+            for (int i = 0; i < size; i++) { // Linear probing
+                int newIndex = (index + i) % size;
+                if (openAddressingTable[newIndex] == null || deleted[newIndex]) {
+                    openAddressingTable[newIndex] = key;
+                    deleted[newIndex] = false;
+                    return;
+                }
+            }
+        }
+    }
+
+    // SEARCH operation
+    public void search(int key) {
+        int index = hash(key);
+
+        if (method.equals("CHAINING")) {
+            if (chainingTable[index].contains(key)) {
+                System.out.println("FOUND");
+                return;
+            }
+        } else if (method.equals("OPEN_ADDRESSING")) {
+            for (int i = 0; i < size; i++) {
+                int newIndex = (index + i) % size;
+                if (openAddressingTable[newIndex] == null && !deleted[newIndex]) break;
+                if (openAddressingTable[newIndex] != null && openAddressingTable[newIndex] == key) {
+                    System.out.println("FOUND");
+                    return;
+                }
+            }
+        }
+        System.out.println("NOT FOUND");
+    }
+
+    // DELETE operation
+    public void delete(int key) {
+        int index = hash(key);
+
+        if (method.equals("CHAINING")) {
+            chainingTable[index].remove((Integer) key);
+        } else if (method.equals("OPEN_ADDRESSING")) {
+            for (int i = 0; i < size; i++) {
+                int newIndex = (index + i) % size;
+                if (openAddressingTable[newIndex] != null && openAddressingTable[newIndex] == key) {
+                    openAddressingTable[newIndex] = null;
+                    deleted[newIndex] = true; // Mark slot as deleted
+                    return;
+                }
+                if (openAddressingTable[newIndex] == null && !deleted[newIndex]) break;
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        
+        int m = sc.nextInt(); // Hash table size
+        String method = sc.next(); // CHAINING or OPEN_ADDRESSING
+        int q = sc.nextInt(); // Number of queries
+        sc.nextLine(); // Consume newline
+
+        HashTable ht = new HashTable(m, method);
+
+        for (int i = 0; i < q; i++) {
+            String[] query = sc.nextLine().split(" ");
+            String cmd = query[0];
+            int key = Integer.parseInt(query[1]);
+
+            switch (cmd) {
+                case "INSERT":
+                    ht.insert(key);
+                    break;
+                case "SEARCH":
+                    ht.search(key);
+                    break;
+                case "DELETE":
+                    ht.delete(key);
+                    break;
+            }
+        }
+        sc.close();
+    }
+}
