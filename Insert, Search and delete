@@ -1,0 +1,59 @@
+import java.util.*;
+
+class DirectAddressTable {
+    private Integer[] table; // Using Integer to store null values
+
+    public DirectAddressTable(int n) {
+        table = new Integer[n]; // Initialize the table with null
+    }
+
+    // Insert (key, value)
+    public void insert(int key, int value) {
+        table[key] = value;
+    }
+
+    // Search (key)
+    public void search(int key) {
+        if (table[key] != null) {
+            System.out.println(table[key]); // Print value if found
+        } else {
+            System.out.println("NOT FOUND"); // Print "NOT FOUND" if key does not exist
+        }
+    }
+
+    // Delete (key)
+    public void delete(int key) {
+        table[key] = null; // Remove the value
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        
+        int n = sc.nextInt(); // Size of table
+        int q = sc.nextInt(); // Number of queries
+        sc.nextLine(); // Consume newline
+
+        DirectAddressTable dat = new DirectAddressTable(n); // Create table
+
+        for (int i = 0; i < q; i++) {
+            String[] query = sc.nextLine().split(" "); // Read and split input
+            
+            String cmd = query[0]; // Command type
+            int key = Integer.parseInt(query[1]); // Extract key
+            
+            switch (cmd) {
+                case "INSERT":
+                    int value = Integer.parseInt(query[2]); // Extract value
+                    dat.insert(key, value);
+                    break;
+                case "SEARCH":
+                    dat.search(key);
+                    break;
+                case "DELETE":
+                    dat.delete(key);
+                    break;
+            }
+        }
+        sc.close();
+    }
+}
